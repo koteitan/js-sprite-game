@@ -46,13 +46,13 @@ out:
  -----------------------------------------*/
 Sprite.prototype.addBg = function(map, chsize, dstpos, name){
   var sp = {
-    "type":"bg",
-    "map":map,
+    "type"  :"bg",
+    "map"   :map,
     "chsize":chsize,
     "dstpos":dstpos,
     "iAnime":0,
-    "name":name,
-    "id":this.sprites++
+    "name"  :name,
+    "id"    :this.sprites++
   };
   this.spriteList.push(sp);
   return sp;
@@ -66,10 +66,10 @@ in:
 out:
  Obtained Sprite ID
  -----------------------------------------*/
-Sprite.prototype.addSprite = function(chid, dstpos, name){
+Sprite.prototype.addSprite = function(ch, dstpos, name){
   var sp={
     "type"  :"sprite",
-    "id"    :chid,
+    "ch"    :ch,
     "dstpos":dstpos,
     "iAnime":0,
     "name"  :name,
@@ -85,7 +85,7 @@ in:
   x,y (unit = pixels)
   z   (unit = layers)
  -----------------------------------------*/
-Sprite.prototype.draw = function(ctx){
+Sprite.prototype.drawAll = function(ctx){
   var animesLcm = 1;
   for(var i=0;i<this.charaList.length;i++){
     animesLcm = lcm(this.charaList[i].animes, animesLcm);
@@ -95,10 +95,9 @@ Sprite.prototype.draw = function(ctx){
     var sp = sorted[i];
     switch(sp.type){
       case "sprite":/*----------------------------------------*/
-        var ch = this.charaList[sp.id];
         ctx.drawImage(this.sheet, 
-          ch.srcpos[0], ch.srcpos[1], ch.size[0], ch.size[1],
-          sp.dstpos[0], sp.dstpos[1], ch.size[0], ch.size[1]);
+          sp.ch.srcpos[0], sp.ch.srcpos[1], sp.ch.size[0], sp.ch.size[1],
+             sp.dstpos[0],    sp.dstpos[1], sp.ch.size[0], sp.ch.size[1]);
       break;
       case "bg": /*----------------------------------------*/
         for(var x=0; x<sp.map.length;x++){

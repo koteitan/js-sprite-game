@@ -8,6 +8,7 @@ var isDebug2=0; //debug flag
 var mmax = 8; //length of edge of the world (common for dimensions)
 // dinamic var on game
 var mode=0; /* 0:play mode. 1:edit mode.*/
+var chara = function(){};
 var map = function(){};
 map.size = [36,36];
 map.map = new Array(map);
@@ -77,12 +78,13 @@ var initGame=function(){
   //graphics
   sprite = new Sprite("spritesheet.png");
   chsize = [8,8];
-  sprite.addChara([chsize[0]*0, 0], [chsize[0], chsize[1]], 1, "blank");
-  sprite.addChara([chsize[0]*1, 0], [chsize[0], chsize[1]], 1, "wall");
-  sprite.addChara([chsize[0]*2, 0], [chsize[0], chsize[1]], 1, "player3");
-  sprite.addChara([chsize[0]*3, 0], [chsize[0], chsize[1]], 1, "player2");
-  sprite.addChara([chsize[0]*4, 0], [chsize[0], chsize[1]], 1, "player1");
-  sprite.addChara([chsize[0]*5, 0], [chsize[0], chsize[1]], 3, "siphon");
+  chara.blank     = sprite.addChara([chsize[0]*0, 0], [chsize[0], chsize[1]], 1, "blank");
+  chara.wall      = sprite.addChara([chsize[0]*1, 0], [chsize[0], chsize[1]], 1, "wall");
+  chara.player = new Array(3);
+  chara.player[0] = sprite.addChara([chsize[0]*2, 0], [chsize[0], chsize[1]], 1, "player3");
+  chara.player[1] = sprite.addChara([chsize[0]*3, 0], [chsize[0], chsize[1]], 1, "player2");
+  chara.player[2] = sprite.addChara([chsize[0]*4, 0], [chsize[0], chsize[1]], 1, "player1");
+  chara.siphon    = sprite.addChara([chsize[0]*5, 0], [chsize[0], chsize[1]], 3, "siphon");
   
   //games
   //background
@@ -104,16 +106,14 @@ var initGame=function(){
     /* 重なったら壁を除去 */
     map.map[siphoneList[i].pos[0]][siphoneList[i].pos[1]] = 0;
   }
+  map.sprite    = sprite.addBg(map.map, chsize, [0,0,0], "");
+  player.sprite = sprite.addSprite(chara.player[0], [player.pos[0]*chsize[0], player.pos[1]*chsize[1], 1],"player");
   for(var i=0; i<shiphones;i++){
     siphoneList[i].sprite 
-      = sprite.addSprite(5, 
+      = sprite.addSprite(chara.siphon, 
       [siphoneList[i].pos[0]*chsize[0],
-       siphoneList[i].pos[1]*chsize[1], 3],"siphone");
+       siphoneList[i].pos[1]*chsize[1], 2],"siphone");
   }
-  map.sprite = sprite.addBg(map.map, chsize, [0,0,0], "");
-  
-  //player
-  player.sprite = sprite.addSprite(2, [player.pos[0]*chsize[0], player.pos[1]*chsize[1], 1],"player");
 }
 /*-----------------------------------
   draw graphic routine.
@@ -128,7 +128,7 @@ var procDraw=function(){
   //sprites -----------
   player.sprite.dstpos[0] = player.pos[0]*chsize[0];
   player.sprite.dstpos[1] = player.pos[1]*chsize[1];
-  sprite.draw(ctx[0]);
+  sprite.drawAll(ctx[0]);
 }
 
 
