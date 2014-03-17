@@ -167,7 +167,6 @@ var initGame=function(){
   }
   mode = 0;
   readyPlay();
-  initLevelList();
 }
 /*-----------------------------------
   draw graphic routine.
