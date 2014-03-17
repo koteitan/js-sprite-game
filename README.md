@@ -1,22 +1,24 @@
-  4dsoko -- 4-dimensional sokoban like puzzle.
+------------------------------------------
+  js-sprite-game
+  template of the javascript code
+  for game with sprite
+------------------------------------------
 
   concept:
-    4-dimensional sokoban like puzzle.
-
-  game site:
-    http://www.ukaibutton.com/4dsoko/
+    - javascript HTML5 Canvas
+    - mainly worked on android and iphone
+    - template based on realtime or roguelike
+    - design with sprite and sprite sheet
+    
+  site:
+    http://www.ukaibutton.com/js-sprite-game/
 
   platform:
-    JavaScript / HTML5 Canvas
+    javaScript / HTML5 Canvas
 
   how to use in offline:
     download all files and open index.html.
     If you use with IE, excanvas.js is required.
-
-  forum:
-    Why don't you make 4-dimensional game? (Japanese Only)
-    http://toro.2ch.net/test/read.cgi/gamedev/1151809341/
-
 
                                                  koteitan
                            http://twitter.com/#!/koteitan
