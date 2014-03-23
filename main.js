@@ -20,21 +20,18 @@ map.blank = 0;
 map.wall  = 1;
 var player = function(){}; // const for player
 player.pos = [0,0];// position of player
-/* motiondiff[dim][key] 
-  = amount of change of position in [dim]'s dimension 
-  when the key is [key] pushed.*/
-  var motiondiff = [
-  //a  w  d  x  
-  [-1, 0, +1, 0], //x
-  [ 0,-1, 0, +1], //y
-];
 var shiphones = 2;
 var siphoneList = [];
 var sprite; // sprite object
 var chsize; // charactor size (unit is pixcels)
 
 var leftTask=0; // number of left box (or goal)
-var gameState=0; // game state.0=unsolved / 1=solved and entering name / 2=entered
+var gameState = "userinput"; 
+
+var input = function(){};
+input.type = "none";
+input.move = [0,0];
+
 //ENTRY POINT --------------------------
 window.onload=function(){
   initGui();
@@ -44,6 +41,18 @@ window.onload=function(){
 }
 //MAIN LOOP ------------------------
 var procAll=function(){
+  switch(gameState){
+    case "userinput":
+    break;
+    case "usermotion":
+    var next = [player.pos[0]+input.move[0], player.pos[1]+input.move[1]];
+    if(map.map[next[0]][next[1]]==map.blank){
+      player.pos = next;
+      isRequestedDraw = true;
+    }
+    gameState = "userinput";
+    break;
+  }
   if(isRequestedDraw){
     procDraw();
     isRequestedDraw = false;
@@ -56,11 +65,8 @@ var canvas = new Array(canvases);
 var ctx    = new Array(canvases);
 var isRequestedDraw = true;
 var frameRate;
-if(document.all){
-  frameRate =  1; // [fps]
-}else{
-  frameRate = 60; // [fps]
-}
+frameRate = 60; // [fps]
+
 var debugout;
 var isKeyTyping;
 //initialize -----------
@@ -90,7 +96,7 @@ var initGame=function(){
   //background
   for(var x=0;x<map.size[0];x++){
     for(var y=0;y<map.size[1];y++){
-      if(Math.random()>1/4) map.map[x][y] = map.blank;
+      if(Math.random()>1/16) map.map[x][y] = map.blank;
                        else map.map[x][y] = map.wall;
     }
   }
@@ -118,48 +124,59 @@ var initGame=function(){
 /*-----------------------------------
   draw graphic routine.
 -----------------------------------*/
-var procDraw=function(){
+var procDraw = function(){
   //clear ---------
   ctx[0].clearRect(0, 0, canvas[0].width-1, canvas[0].height-1);
-  //border ---------
-  ctx[0].strokeStyle='rgb(0,0,0)';
-  ctx[0].strokeWeight='1';
-  ctx[0].strokeRect(0, 0, canvas[0].width-1, canvas[0].height-1);
   //sprites -----------
   player.sprite.dstpos[0] = player.pos[0]*chsize[0];
   player.sprite.dstpos[1] = player.pos[1]*chsize[1];
   sprite.drawAll(ctx[0]);
+  //border all ---------
+  ctx[0].strokeStyle='rgb(255,2,0)';
+  ctx[0].strokeWeight='1';
+  if(isDragging){
+    ctx[0].strokeStyle='rgb(255,255,2)';
+  }
+  ctx[0].strokeRect(0, 0, canvas[0].width-1, canvas[0].height-1);
 }
 
 
 //event handlers after queue ------------
-var handleMouseDown = function(){
-}
-var handleMouseDragging = function(){
-  if(!mouseWithShiftKey){
-  }else{
-  }
-}
 var handleMouseUp = function(){
-}
-var handleMouseMoving = function(){
-}
-var handleMouseWheel = function(){
-  if(mouseWheel[0]>0) moveCursor(0);
-  if(mouseWheel[0]<0) moveCursor(4);
-  if(mouseWheel[1]>0) moveCursor(1);
-  if(mouseWheel[1]<0) moveCursor(5);
-  isRequestedDraw = true;
+  if(gameState=="userinput"){
+    var d  = [mouseUpPos[0]-mouseDownPos[0], mouseUpPos[1]-mouseDownPos[1]];
+    var r2 = d[0]*d[0]+d[1]*d[1];
+    if(r2>12*12){
+      if(Math.abs(d[0])>Math.abs(d[1])){
+        input.type = "move";
+        input.move[0] = (d[0]<0)? -1:+1;
+        input.move[1] = 0;
+        gameState = "usermotion";
+      }else{
+        input.type = "move";
+        input.move[0] = 0;
+        input.move[1] = (d[1]<0)? -1:+1;
+        gameState = "usermotion";
+      }
+    }
+  }
 }
 var handleKeyDown = function(e){
   // play
   var c = String.fromCharCode(e.keyCode);
   var motion = "AWDX".indexOf(c);
-  if(motion<0) return;
-  player.pos[0] += motiondiff[0][motion];
-  player.pos[1] += motiondiff[1][motion];
-  //prevent key
- if(e.preventDefault) e.preventDefault();
-  e.returnValue = false;
-  isRequestedDraw = true;
+    var motiondiff = [
+    //a  w  d  x  
+    [-1, 0, +1, 0], //x
+    [ 0,-1, 0, +1], //y
+  ];
+  if(motion>=0){
+    if(gameState=="userinput"){
+      input.type = "move";
+      input.move[0] = motiondiff[0][motion];
+      input.move[1] = motiondiff[1][motion];
+      gameState = "usermotion";
+    }
+    e.preventDefault();
+  }
 }
