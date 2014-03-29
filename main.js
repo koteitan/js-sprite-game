@@ -45,6 +45,8 @@ var procAll=function(){
     }
     break;
     case "userinput":
+      sprite.incAnime(1/20);
+      isRequestedDraw = true;
     break;
     case "usermotion":
     var next = player.pos.clone();
@@ -240,11 +242,9 @@ Sprite.prototype.drawAll4d = function(ctx){
     switch(sp.type){
       case "sprite":/*----------------------------------------*/
         var sp_dstpos_2d = sp.dstpos.to2d();
-        if(sp.name=="enemy[0]"){
-          var a=1;
-        }
+        var a = Math.floor(this.iAnime % sp.ch.animes);
         ctx.drawImage(this.sheet, 
-          sp.ch.srcpos[0], sp.ch.srcpos[1], 
+          sp.ch.srcpos[0]+a*sp.ch.size[0], sp.ch.srcpos[1], 
           sp.ch.size  [0], sp.ch.size  [1],
           sp_dstpos_2d[0], sp_dstpos_2d[1],
           sp.ch.size  [0], sp.ch.size  [1]);
@@ -255,8 +255,9 @@ Sprite.prototype.drawAll4d = function(ctx){
             for(var z=0; z<sp.map[x][y].length;z++){
               for(var w=0; w<sp.map[x][y][z].length;w++){
                 var ch = this.charaList[sp.map[x][y][z][w]];
+                var a = Math.floor(this.iAnime % ch.animes);
                   ctx.drawImage(this.sheet, 
-                    ch.srcpos[0], ch.srcpos[1], 
+                    ch.srcpos[0]+a*ch.size[0], ch.srcpos[1], 
                     ch.size  [0], ch.size  [1],
                     sp.dstpos[0]+(x+z*map.size[0])*sp.chsize[0],
                     sp.dstpos[1]+(y+w*map.size[1])*sp.chsize[1],
