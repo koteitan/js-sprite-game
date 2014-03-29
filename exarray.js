@@ -47,3 +47,38 @@ Array.prototype.clone = function(){
     }
     return Array.apply( null, this );
 }
+/* Value of multidimensional array
+   with index array i[d]
+   this function returns a[i[0]][i[1]][i[2]].  
+   ex.
+     [[1,2,3],[4,5,6],[7,8,9]].at([2,1])=8;
+     [[1,2,3],[4,5,6],[7,8,9]].at([2])=[7,8,9];
+*/
+Array.prototype.at = function(i){
+  var b = this;
+  for(var d=0;d<i.length;d++) b = b[i[d]];
+  return b;
+}
+/*
+*/
+Array.zeros = function(s){
+  var f=function(s, d){
+    var a = new Array(s[d]);
+    if(d==s.length-1){
+      for(var i=0;i<s[d];i++) a[i] = 0;
+    }else{
+      for(var i=0;i<s[d];i++) a[i] = f(s,d+1);
+    }
+    return a;
+  };
+  return f(s,0);
+}
+Array.prototype.toString = function(){
+  var s="[";
+  var i=0;
+  for(i=0;i<this.length-1;i++){
+    s+=this[i].toString()+", ";
+  }
+  s+=this[i].toString()+"]";
+  return s;
+}
