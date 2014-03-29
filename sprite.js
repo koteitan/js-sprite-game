@@ -61,17 +61,18 @@ Sprite.prototype.addBg = function(map, chsize, dstpos, name){
 /* add new sprite ------------------------
 in:
  chid   = Charactor ID
- dstpos = [x,y,z] = drown position:
+ dstpos = [x,y] = drown position:
   x,y (unit = pixels)
-  z   (unit = height of layers (lower is more back))
+ layer = height of layers (the lower is more back)
 out:
  Obtained Sprite ID
  -----------------------------------------*/
-Sprite.prototype.addSprite = function(ch, dstpos, name){
+Sprite.prototype.addSprite = function(ch, dstpos, layer, name){
   var sp={
     "type"  :"sprite",
     "ch"    :ch,
     "dstpos":dstpos,
+    "layer" :layer,
     "iAnime":0,
     "name"  :name,
     "id"    :this.sprites++
@@ -89,7 +90,7 @@ Sprite.prototype.drawAll = function(ctx){
     animesLcm = lcm(this.charaList[i].animes, animesLcm);
   }
   var sorted = this.spriteList.sort(
-    function(a,b){return a.dstpos[2]-b.dstpos[2]});
+    function(a,b){return a.depth-b.depth});
   for(var i=0;i<sorted.length;i++){
     var sp = sorted[i];
     switch(sp.type){
