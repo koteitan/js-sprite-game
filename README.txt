@@ -1,7 +1,8 @@
 ------------------------------------------
-  js-sprite-game
+  4droguelike
   template of the javascript code
-  for game with sprite
+  for the 4 dimensional rogue-like-game 
+  with sprite
 ------------------------------------------
 
   concept:
@@ -11,7 +12,7 @@
     - design with sprite and sprite sheet
     
   site:
-    http://www.ukaibutton.com/js-sprite-game/
+    http://www.ukaibutton.com/4droguelike/
 
   platform:
     javaScript / HTML5 Canvas
@@ -21,5 +22,5 @@
     If you use with IE, excanvas.js is required.
 
                                                  koteitan
-                           http://twitter.com/#!/koteitan
+                              http://twitter.com/koteitan
 
