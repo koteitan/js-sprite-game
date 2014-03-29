@@ -33,6 +33,13 @@ Array.prototype.sum = function(){
   }
   return ret;
 }
+Array.prototype.prod = function(){
+  var ret = this[0];
+  for(var i=1;i<this.length;i++){
+    ret *= this[i]
+  }
+  return ret;
+}
 Array.prototype.mean = function(){
     return this.sum()/this.length;
 }
