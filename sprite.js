@@ -19,7 +19,8 @@ var Sprite = function(url){
 in:
   srcpos [2] = [x,y] = position of origin of the charactor 
                        in the sprite sheet (unit is pxcels)
-  size[2] = [x,y] = size of charactor in the sprite sheet (unit is pixels)
+  size   [2] = [x,y] = size of charactor in the sprite sheet 
+                       (unit is pixels)
   animes  = number of frame of the animations
 out:
  obtained Charactor
@@ -90,22 +91,28 @@ Sprite.prototype.drawAll = function(ctx){
   for(var i=0;i<this.charaList.length;i++){
     animesLcm = lcm(this.charaList[i].animes, animesLcm);
   }
-  var sorted = this.spriteList.sort(function(a,b){return a.dstpos[2]-b.dstpos[2]});
+  var sorted = this.spriteList.sort(
+    function(a,b){return a.dstpos[2]-b.dstpos[2]});
   for(var i=0;i<sorted.length;i++){
     var sp = sorted[i];
     switch(sp.type){
       case "sprite":/*----------------------------------------*/
         ctx.drawImage(this.sheet, 
-          sp.ch.srcpos[0], sp.ch.srcpos[1], sp.ch.size[0], sp.ch.size[1],
-             sp.dstpos[0],    sp.dstpos[1], sp.ch.size[0], sp.ch.size[1]);
+          sp.ch.srcpos[0], sp.ch.srcpos[1], 
+          sp.ch.size  [0], sp.ch.size  [1],
+          sp.dstpos   [0], sp.dstpos   [1], 
+          sp.ch.size  [0], sp.ch.size  [1]);
       break;
       case "bg": /*----------------------------------------*/
         for(var x=0; x<sp.map.length;x++){
           for(var y=0; y<sp.map[0].length;y++){
             var ch = this.charaList[sp.map[x][y]];
             ctx.drawImage(this.sheet, 
-              ch.srcpos[0], ch.srcpos[1], ch.size[0], ch.size[1],
-              sp.dstpos[0]+x*sp.chsize[0], sp.dstpos[1]+y*sp.chsize[1], ch.size[0], ch.size[1]);
+              ch.srcpos[0], ch.srcpos[1], 
+              ch.size  [0], ch.size  [1],
+              sp.dstpos[0]+x*sp.chsize[0], 
+              sp.dstpos[1]+y*sp.chsize[1], 
+              ch.size[0], ch.size[1]);
           }
         }
       break;
