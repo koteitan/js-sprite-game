@@ -4,7 +4,7 @@ in: url = image png url
  -----------------------------------------*/
 var Sprite = function(url){
    this.sheet = new Image();
-   this.sheet.src = url;
+   this.sheet.src = url + "?" + new Date().getTime();
    
    this.charaList = [];
    this.spriteList = [];
