@@ -23,8 +23,7 @@ var sprite; // sprite object
 var chsize; // charactor size (unit is pixcels)
 
 var leftTask=0; // number of left box (or goal)
-var gameState = "userinput"; 
-
+var gameState = "initializing";
 var input = function(){};
 input.type = "none";
 input.move = Array.zeros([dims]);
@@ -39,6 +38,12 @@ window.onload=function(){
 //MAIN LOOP ------------------------
 var procAll=function(){
   switch(gameState){
+    case "waitimage":
+    if(sprite.sheet.complete){
+      gameState = "userinput";
+      isRequestedDraw = true;
+    }
+    break;
     case "userinput":
     break;
     case "usermotion":
@@ -141,6 +146,7 @@ var initGame=function(){
     siphoneList[i].sprite = sprite.addSprite(chara.siphon, 
       siphoneList[i].pos.concat(2), "siphone");
   }
+  gameState = "waitimage"; 
 }
 Array.prototype.to2d = function(){
   return [(this[2]*map.size[0] + this[0])*chsize[0],
@@ -237,6 +243,40 @@ var handleMouseUp = function(){
         input.type = "move";
         input.move = [0, (d[1]<0)? -1:+1, 0, 0];
         gameState = "usermotion";
+      }
+    }else{
+      if(mouseUpPos[1] > (player.pos[3]+0)*chsize[1]*map.size[3]&& 
+         mouseUpPos[1] < (player.pos[3]+1)*chsize[1]*map.size[3]){
+        // mouse up in same z
+        if(
+          mouseUpPos[0] > (player.pos[2]+1)*chsize[0]*map.size[2]){
+          // z++
+          input.type = "move";
+          input.move = [0, 0, +1, 0];
+          gameState = "usermotion";
+        }else if(
+          mouseUpPos[0] < (player.pos[2]+0)*chsize[0]*map.size[2]){
+          // z--
+          input.type = "move";
+          input.move = [0, 0, -1, 0];
+          gameState = "usermotion";
+          }
+      }else if(
+        mouseUpPos[0] > (player.pos[2]+0)*chsize[0]*map.size[2]&& 
+        mouseUpPos[0] < (player.pos[2]+1)*chsize[0]*map.size[2]){
+        // mouse up in same w
+        if(mouseUpPos[1] > (player.pos[3]+1)*chsize[1]*map.size[3]){
+          // w++
+          input.type = "move";
+          input.move = [0, 0, 0, +1];
+          gameState = "usermotion";
+        }else if(
+           mouseUpPos[1] < (player.pos[3]+0)*chsize[1]*map.size[3]){
+          // w--
+          input.type = "move";
+          input.move = [0, 0, 0, -1];
+          gameState = "usermotion";
+        }
       }
     }
   }
