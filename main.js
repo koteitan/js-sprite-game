@@ -108,12 +108,12 @@ var initGame=function(){
   
   //games
   //map
-  for(var w=0;w<map.size[0];w++){
-    for(var z=0;z<map.size[1];z++){
-      for(var y=0;y<map.size[2];y++){
-        for(var x=0;x<map.size[3];x++){
-          if(Math.random()>1/16) map.map[w][z][y][x] = map.blank;
-            else map.map[w][z][y][x] = map.wall;
+  for(var x=0;x<map.size[0];x++){
+    for(var y=0;y<map.size[1];y++){
+      for(var z=0;z<map.size[2];z++){
+        for(var w=0;w<map.size[3];w++){
+          if(Math.random()>1/16) map.map[x][y][z][w] = map.blank;
+            else map.map[x][y][z][w] = map.wall;
         }
       }
     }
@@ -143,15 +143,15 @@ var initGame=function(){
   }
 }
 Array.prototype.to2d = function(){
-  return [(this[0]*map.size[1] + this[2])*chsize[0],
-          (this[1]*map.size[2] + this[3])*chsize[1]];
+  return [(this[2]*map.size[0] + this[0])*chsize[0],
+          (this[3]*map.size[1] + this[1])*chsize[1]];
 }
 /* draw map and sprite ------------------------
 in:
  chid = Charactor ID
- pos  = [x,y,z] = drown position:
-  x,y (unit = pixels)
-  z   (unit = layers)
+ pos  = [x,y,z,w,u] = drown position:
+  x,y,z,w (unit = charactors)
+  u       (unit = layers)
  -----------------------------------------*/
 Sprite.prototype.drawAll4d = function(ctx){
   var animesLcm = 1;
@@ -175,16 +175,16 @@ Sprite.prototype.drawAll4d = function(ctx){
           sp.ch.size  [0], sp.ch.size  [1]);
       break;
       case "bg": /*----------------------------------------*/
-        for(var w=0; w<sp.map.length;w++){
-          for(var z=0; z<sp.map[w].length;z++){
-            for(var y=0; y<sp.map[w][z].length;y++){
-              for(var x=0; x<sp.map[w][z][y].length;x++){
-                var ch = this.charaList[sp.map[w][z][y][x]];
+        for(var x=0; x<sp.map.length;x++){
+          for(var y=0; y<sp.map[x].length;y++){
+            for(var z=0; z<sp.map[x][y].length;z++){
+              for(var w=0; w<sp.map[x][y][z].length;w++){
+                var ch = this.charaList[sp.map[x][y][z][w]];
                   ctx.drawImage(this.sheet, 
                     ch.srcpos[0], ch.srcpos[1], 
                     ch.size  [0], ch.size  [1],
-                    sp.dstpos[1]+(y+w*map.size[3])*sp.chsize[1],
-                    sp.dstpos[0]+(x+z*map.size[2])*sp.chsize[0],
+                    sp.dstpos[0]+(x+z*map.size[0])*sp.chsize[0],
+                    sp.dstpos[1]+(y+w*map.size[1])*sp.chsize[1],
                     ch.size[0]  , ch.size[1]);
               }
             }
@@ -211,10 +211,10 @@ var procDraw = function(){
   for(var w=0;w<map.size[0];w++){
     for(var z=0;z<map.size[1];z++){
       ctx[0].strokeRect(
-        w          *map.size[2]*chsize[0], 
-        z          *map.size[3]*chsize[1], 
-        map.size[2]*chsize[0],
-        map.size[3]*chsize[1]);
+        z*map.size[2]*chsize[0], 
+        w*map.size[3]*chsize[1], 
+          map.size[2]*chsize[0],
+          map.size[3]*chsize[1]);
     }
   }
 }
@@ -225,15 +225,17 @@ var handleMouseUp = function(){
   if(gameState=="userinput"){
     var d  = [mouseUpPos[0]-mouseDownPos[0], 
               mouseUpPos[1]-mouseDownPos[1]];
-    var r2 = d[0]*d[0]+d[1]*d[1];
-    if(r2>12*12){
+    if(Math.abs(d[0]) > map.size[0]*chsize[0]||
+       Math.abs(d[1]) > map.size[1]*chsize[1]){
       if(Math.abs(d[0])>Math.abs(d[1])){
+        // move in x axis
         input.type = "move";
-        input.move = [0, 0, (d[0]<0)? -1:+1, 0];
+        input.move = [(d[0]<0)? -1:+1, 0, 0, 0];
         gameState = "usermotion";
       }else{
+        // move in y axis
         input.type = "move";
-        input.move = [0, 0, 0, (d[1]<0)? -1:+1];
+        input.move = [0, (d[1]<0)? -1:+1, 0, 0];
         gameState = "usermotion";
       }
     }
@@ -247,10 +249,10 @@ var handleKeyDown = function(e){
     if(e.shiftKey) motion+=2;
     var motiondiff = [
     //a  w  A  W  d  x  D  X
-    [ 0, 0,-1, 0, 0, 0,+1, 0], //w
-    [ 0, 0, 0,-1, 0, 0, 0,+1], //z
-    [-1, 0, 0, 0,+1, 0, 0, 0], //y
-    [ 0,-1, 0, 0, 0,+1, 0, 0], //x
+    [-1, 0, 0, 0,+1, 0, 0, 0], //x
+    [ 0,-1, 0, 0, 0,+1, 0, 0], //y
+    [ 0, 0,-1, 0, 0, 0,+1, 0], //z
+    [ 0, 0, 0,-1, 0, 0, 0,+1], //w
   ];
   if(motion>=0){
     if(gameState=="userinput"){
