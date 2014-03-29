@@ -39,18 +39,19 @@ Sprite.prototype.addChara = function(srcpos, size, animes, name){
 /* add background graphics ------------------------
 in:
   map[x][y] = Charactor ID for position (x,y).
-  dstpos = [x,y,z] = drown position:
+  dstpos = [x,y] = drown position:
    x,y (unit = pixels)
-   z   (unit = height of layers (lower is more back))
+  layer = (unit = height of layers (lower is more back))
 out:
  Obtained Sprite ID
  -----------------------------------------*/
-Sprite.prototype.addBg = function(map, chsize, dstpos, name){
+Sprite.prototype.addBg = function(map, chsize, dstpos, layer, name){
   var sp = {
     "type"  :"bg",
     "map"   :map,
     "chsize":chsize,
     "dstpos":dstpos,
+    "layer" :layer,
     "iAnime":0,
     "name"  :name,
     "id"    :this.sprites++
