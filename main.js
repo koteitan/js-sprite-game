@@ -233,7 +233,7 @@ var handleMouseUp = function(){
         gameState = "usermotion";
       }else{
         input.type = "move";
-        input.move = [0, 0, 0, (d[0]<0)? -1:+1];
+        input.move = [0, 0, 0, (d[1]<0)? -1:+1];
         gameState = "usermotion";
       }
     }
