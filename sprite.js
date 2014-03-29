@@ -81,10 +81,7 @@ Sprite.prototype.addSprite = function(ch, dstpos, name){
 };
 /* draw map and sprite ------------------------
 in:
- chid = Charactor ID
- pos  = [x,y,z] = drown position:
-  x,y (unit = pixels)
-  z   (unit = layers)
+  ctx = destination context
  -----------------------------------------*/
 Sprite.prototype.drawAll = function(ctx){
   var animesLcm = 1;
