@@ -17,17 +17,17 @@ map.blank = 0;
 map.wall  = 1;
 var player = function(){}; // const for player
 player.pos = Array.zeros([dims]);// position of player
-var shiphones = 2;
+var shiphones;
 var siphoneList = [];
 var sprite; // sprite object
 var chsize; // charactor size (unit is pixcels)
-
 var leftTask=0; // number of left box (or goal)
 var gameState = "initializing";
 var input = function(){};
 input.type = "none";
 input.move = Array.zeros([dims]);
-
+var enemy;
+var enemies;
 //ENTRY POINT --------------------------
 window.onload=function(){
   initGui();
@@ -94,57 +94,117 @@ var initGui=function(){
 } 
 //game
 var initGame=function(){
+  //-------------------------------
   //graphics
+  //-------------------------------
   sprite = new Sprite("spritesheet.png");
   chsize = [8,8];
   chara.blank     = sprite.addChara(
-    [chsize[0]*0, 0], [chsize[0], chsize[1]], 1, "blank");
+    [chsize[0]*0, 0], chsize, 1, "blank");
   chara.wall      = sprite.addChara(
-    [chsize[0]*1, 0], [chsize[0], chsize[1]], 1, "wall");
+    [chsize[0]*1, 0], chsize, 1, "wall");
   chara.player = new Array(3);
   chara.player[0] = sprite.addChara(
-    [chsize[0]*2, 0], [chsize[0], chsize[1]], 1, "player3");
+    [chsize[0]*2, 0], chsize, 1, "player.hp3");
   chara.player[1] = sprite.addChara(
-    [chsize[0]*3, 0], [chsize[0], chsize[1]], 1, "player2");
+    [chsize[0]*3, 0], chsize, 1, "player.hp2");
   chara.player[2] = sprite.addChara(
-    [chsize[0]*4, 0], [chsize[0], chsize[1]], 1, "player1");
+    [chsize[0]*4, 0], chsize, 1, "player.hp1");
   chara.siphon    = sprite.addChara(
-    [chsize[0]*5, 0], [chsize[0], chsize[1]], 3, "siphon");
-  
-  //games
+    [chsize[0]*5, 0], chsize, 3, "siphon");
+  //enemies----------------
+  enemyIndex = ["lap","virus","daemon","crypt"];
+  chara.enemies = enemyIndex.length;
+  chara.enemy = new Array(chara.enemies);  
+  //enemies lap ----------------
+  chara.enemy[0] = new Array(2);
+  chara.enemy[0][0] = sprite.addChara(
+    [chsize[0]*0, chsize[0]*1],chsize, 2, "lap.hp2");
+  chara.enemy[0][1] = sprite.addChara(
+    [chsize[0]*2, chsize[0]*1],chsize, 2, "lap.hp1");
+  //enemies virus ----------------
+  chara.enemy[1] = new Array(2);
+  chara.enemy[1][0] = sprite.addChara(
+    [chsize[0]*4,chsize[0]*1],chsize, 2, "virus.hp2");
+  chara.enemy[1][1] = sprite.addChara(
+    [chsize[0]*6,chsize[0]*1],chsize, 2, "virus.hp1");
+  //enemies daemon ----------------
+  chara.enemy[2] = new Array(3);
+  chara.enemy[2][0] = sprite.addChara(
+    [chsize[0]*0,chsize[0]*2],chsize, 2, "daemon.hp3");
+  chara.enemy[2][1] = sprite.addChara(
+    [chsize[0]*2,chsize[0]*2],chsize, 2, "daemon.hp2");
+  chara.enemy[2][2] = sprite.addChara(
+    [chsize[0]*4,chsize[0]*2],chsize, 2, "daemon.hp1");
+  //enemies crypt ----------------
+  chara.enemy[3] = new Array(3);
+  chara.enemy[3][0] = sprite.addChara(
+    [chsize[0]*0,chsize[0]*3],chsize, 2, "crypt.hp2");
+  chara.enemy[3][1] = sprite.addChara(
+    [chsize[0]*2,chsize[0]*3],chsize, 2, "crypt.hp1");
+  chara.enemy[3][2] = sprite.addChara(
+    [chsize[0]*4,chsize[0]*3],chsize, 1, "crypt.hidden");
+  //-------------------------------
   //map
+  //-------------------------------
+  var blanklist = new Array(map.size.prod());
+  var bi=0;
   for(var x=0;x<map.size[0];x++){
     for(var y=0;y<map.size[1];y++){
       for(var z=0;z<map.size[2];z++){
         for(var w=0;w<map.size[3];w++){
-          if(Math.random()>1/16) map.map[x][y][z][w] = map.blank;
-            else map.map[x][y][z][w] = map.wall;
+          blanklist[bi++] = [x,y,z,w];
         }
       }
     }
   }
-  //siphone
-  var initSiphones = 2;
-  for(var i=0; i<shiphones;i++){
-    siphoneList.push({"pos":
-      [
-        Math.floor(Math.random()*map.size[0]),
-        Math.floor(Math.random()*map.size[1]),
-        Math.floor(Math.random()*map.size[2]),
-        Math.floor(Math.random()*map.size[3])
-        ]
-    });
-    /* remove wall when siphone */
-    map.map[siphoneList[i].pos[0]][siphoneList[i].pos[1]]
-           [siphoneList[i].pos[2]][siphoneList[i].pos[3]]= 0;
+  //player ----------------
+  player.pos = blanklist.splice(
+      Math.floor(Math.random()*blanklist.length),1)[0];
+  player.hp = 3;
+  //enemies ----------------
+  var enemy_kinds = 4;
+  var enemy_hpmax = [2,2,3,2];
+  enemies = 10;
+  enemy = new Array(enemies);
+  for(var e=0;e<enemies;e++){
+    enemy[e] = function(){};
+    enemy[e].pos = blanklist.splice(
+        Math.floor(Math.random()*blanklist.length),1)[0];
+    enemy[e].type = Math.floor(Math.random()*enemy_kinds);
+    enemy[e].hpmax = enemy_hpmax[enemy[e].type];
+    enemy[e].hp    = enemy[e].hpmax;
   }
-    
-  map.sprite    = sprite.addBg(map.map, chsize, [0,0,0], "bg");
-  player.sprite = sprite.addSprite(chara.player[0],
-    player.pos.concat(1), "player");
+  //siphone----------------
+  var initSiphones = 2;
+  shiphones = initSiphones;
+  siphoneList = new Array(shiphones);
+  for(var i=0; i<shiphones;i++){
+    siphoneList[i] = function(){};
+    siphoneList[i].pos = blanklist.splice(
+      Math.floor(Math.random()*blanklist.length),1)[0];
+  }
+  //wall--------------------
+  var walls=Math.floor(map.size.prod()/8);
+  for(var i=0; i<walls;i++){
+    var pos = blanklist.splice(
+      Math.floor(Math.random()*blanklist.length),1)[0];
+      map.map[pos[0]][pos[1]][pos[2]][pos[3]] = map.wall;
+  }
+  //----------------------------------
+  //sprites
+  //----------------------------------
+  map.sprite    = sprite.addBg(map.map, chsize, [0,0], 0, "bg");
   for(var i=0; i<shiphones;i++){
     siphoneList[i].sprite = sprite.addSprite(chara.siphon, 
-      siphoneList[i].pos.concat(2), "siphone");
+      siphoneList[i].pos, 1, "siphone["+i+"]");
+  }
+  player.sprite = sprite.addSprite(chara.player[0],
+    player.pos, 2, "player");
+  for(var i=0; i<enemies;i++){
+    enemy[i].sprite = sprite.addSprite(
+      chara.enemy[enemy[i].type][enemy[i].hpmax-enemy[i].hp], 
+      enemy[i].pos, 3, "enemy["+i+"]");
   }
   gameState = "waitimage"; 
 }
@@ -155,9 +215,9 @@ Array.prototype.to2d = function(){
 /* draw map and sprite ------------------------
 in:
  chid = Charactor ID
- pos  = [x,y,z,w,u] = drown position:
+ dstpos = [x,y,z,w] = drown position:
   x,y,z,w (unit = charactors)
-  u       (unit = layers)
+ layer  = height of layer (lower is more back)
  -----------------------------------------*/
 Sprite.prototype.drawAll4d = function(ctx){
   var animesLcm = 1;
@@ -165,13 +225,13 @@ Sprite.prototype.drawAll4d = function(ctx){
     animesLcm = lcm(this.charaList[i].animes, animesLcm);
   }
   var sorted = this.spriteList.sort(function(a,b){
-    return a.dstpos[4]-b.dstpos[4]});
+    return a.layer-b.layer});
   for(var i=0;i<sorted.length;i++){
     var sp = sorted[i];
     switch(sp.type){
       case "sprite":/*----------------------------------------*/
         var sp_dstpos_2d = sp.dstpos.to2d();
-        if(sp.name=="player"){
+        if(sp.name=="enemy[0]"){
           var a=1;
         }
         ctx.drawImage(this.sheet, 
@@ -208,9 +268,6 @@ Sprite.prototype.drawAll4d = function(ctx){
 var procDraw = function(){
   //clear ---------
   ctx[0].clearRect(0, 0, canvas[0].width-1, canvas[0].height-1);
-  //sprites -----------
-  player.sprite.dstpos = player.pos;
-  sprite.drawAll4d(ctx[0]);
   //border ---------
   ctx[0].strokeStyle='rgb(255,2,0)';
   ctx[0].strokeWeight='1';
@@ -223,6 +280,9 @@ var procDraw = function(){
           map.size[3]*chsize[1]);
     }
   }
+  //sprites -----------
+  player.sprite.dstpos = player.pos;
+  sprite.drawAll4d(ctx[0]);
 }
 
 
