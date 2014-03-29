@@ -63,7 +63,12 @@ var procAll=function(){
       player.pos = next;
       isRequestedDraw = true;
     }
+    gameState = "enemymotion";
+    break;
+    case "enemymotion":
+    makeEnemyMotion();
     gameState = "userinput";
+    isRequestedDraw = true;
     break;
   }
   if(isRequestedDraw){
@@ -113,8 +118,12 @@ var initGame=function(){
   chara.siphon    = sprite.addChara(
     [chsize[0]*5, 0], chsize, 3, "siphon");
   //enemies----------------
-  enemyIndex = ["lap","virus","daemon","crypt"];
-  chara.enemies = enemyIndex.length;
+  chara.enemies = 4;
+  enemyindex = function(){};
+  enemyindex.lap = 0;
+  enemyindex.virus = 1;
+  enemyindex.daemon = 2;
+  enemyindex.crypt = 3;
   chara.enemy = new Array(chara.enemies);  
   //enemies lap ----------------
   chara.enemy[0] = new Array(2);
@@ -285,7 +294,82 @@ var procDraw = function(){
   sprite.drawAll4d(ctx[0]);
 }
 
+var makeEnemyMotion = function(){
+  for(var i=0;i<enemies;i++){
+    var m;// 1=no, 0=mobile, 2=mobile but there exists other enemy
+    var p = enemy[i].pos;
+    //wall
+    if(enemy[i].type==enemyindex.lap){
+      m = Array.zeros(map.size);
+    }else{
+      m = map.map.clone();
+    }
+//    var m_sprite = sprite.addBg(m, chsize, [0,0], 4, "sm");
+    for(var j=0;j<enemies;j++){
+      //other enemies places are immobile
+      if(j!=i) m[p[0]][p[1]][p[2]][p[3]] = 2;
+    }
+    var initialm = m.clone();
+    var now = [player.pos.clone()];
+    m[now[0][0]][now[0][1]][now[0][2]][now[0][3]]=1;// immobile
+    var next = [];
+    var arrived = [];
+    while(now.length>0){
+      for(var ni=0;ni<now.length;ni++){
+        for(var d=0;d<dims;d++){
+          var near;
+          near = now[ni].clone();
+          near[d]--;
+          if(near[d]>=0 && m.at(near)!=1){
+            next.push(near);
+            if(near.isEqual(p)){
+              arrived.push(now[ni]);
+            }else{
+              m[near[0]][near[1]][near[2]][near[3]]=1; // immobile
+            }
+          }
+          near = now[ni].clone();
+          near[d]++;
+          if(near[d]<map.size[d] && m.at(near)!=1){
+            next.push(near);
+            if(near.isEqual(p)){
+              arrived.push(now[ni]);
+            }else{
+              m[near[0]][near[1]][near[2]][near[3]]=1; // immobile
+            }
+          }
+        }//d
+//        sprite.drawAll4d(ctx[0]);
+      }//ni
+      if(arrived.length>0){
+        //can arrive
+        var doBreak=false;
+        for(var ai=0;ai<arrived.length;ai++){
+          if(initialm.at(arrived[ai])==0){
+            enemy[i].pos = arrived[
+              Math.floor(arrived.length*Math.random())];
+              enemy[i].sprite.dstpos = enemy[i].pos;
+            doBreak=true;
+            break;
+          }
+        }
+        if(doBreak) break;
+      }//if arrived
+      
+      // cannot arrive
+      if(next.length>0){
+        now = next;
+        next = [];
+      }else{
+        //no next
+        break; //abandon to move
+      }
+    }//while(now.length>0)
 
+    //rokumen soka
+    var roku=0;
+  }//i
+}
 //event handlers after queue ------------
 var handleMouseUp = function(){
   if(gameState=="userinput"){
