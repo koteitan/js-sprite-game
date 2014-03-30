@@ -16,30 +16,20 @@ var mouseUpPos   = [-1,-1];
 // initialization
 var initEvent = function(){
   eventQueue = new Array(0);
-  if (!document.all){
-    //not IE
-    canvas[0].ontouchstart = addTouchEvent;
-    canvas[0].ontouchmove  = addTouchEvent;
-    canvas[0].ontouchend   = addTouchEvent;
-    canvas[0].onmousedown = addEvent;
-    canvas[0].onmousemove = addEvent;
-    canvas[0].onmouseup   = addEvent;
-    canvas[0].onmouseout  = addEvent;
-    window.onkeydown       = addEvent;
-  }else{
-    //IE Only
-    canvas[0].attachEvent('ontouchstart', addEvent_forIE);
-    canvas[0].attachEvent('ontouchend'  , addEvent_forIE);
-    document.onkeydown      = addEvent_forIE;
-  }
+  canvas[0].ontouchstart = addTouchEvent;
+  canvas[0].ontouchmove  = addTouchEvent;
+  canvas[0].ontouchend   = addTouchEvent;
+  canvas[0].onmousedown = addEvent;
+  canvas[0].onmousemove = addEvent;
+  canvas[0].onmouseup   = addEvent;
+  canvas[0].onmouseout  = addEvent;
+  window.onkeydown       = addEvent;
 };
 // procedure
 var removeClientOffset = function(e){
-  if(!document.all){
-    if(e.target.getBoundingClientRect){
-      var rect = e.target.getBoundingClientRect();
-      return [e.x-rect.left, e.y-rect.top];
-    }
+  if(e.target.getBoundingClientRect){
+    var rect = e.target.getBoundingClientRect();
+    return [e.x-rect.left, e.y-rect.top];
   }
   return [e.x, e.y];
 };
@@ -110,16 +100,3 @@ var addTouchEvent = function(){
   event.preventDefault();
   eventQueue.push(event);
 }
-// sub routines
-// addEvent(Event e)
-var addEvent_forIE = function(){
-  var e=new Object();
-  e.type=event.type;
-  e.x=event.offsetX;
-  e.y=event.offsetY;
-  e.keyCode = event.keyCode;
-  e.target = event.srcElement;
-  e.button=[-1,0,2,-1,1,-1,-1,-1][event.button];
-  addEvent(e);
-};
-

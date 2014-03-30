@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html><head>
+<link rel="stylesheet" media="only screen and (-webkit-min-device-pixel-ratio: 2)" type="text/css" href="iphone4.css" />
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-<!--[if IE]>
-<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
-<script type="text/javascript" src="excanvas.js"></script>
-<![endif]-->
 <meta http-equiv="Content-Style-Type" content="text/css">
 <script type="text/javascript" src="./exarray.js"></script>
 <script type="text/javascript" src="./exmath.js"></script>
@@ -23,17 +20,22 @@
   input{border-style:solid;border-color:#00FF00;background-color:#000000;color:#00FF00}
   .tdbutton{border-width:1px;border-style:solid;border-color:white;height:30px;width:30px}
   hr{border-style:solid}
+  * {
+    -webkit-user-select: none;
+    image-rendering: -webkit-optimize-contrast;
+  }
 --></style>
-<title>4D Rogue like game</title></head>
+<title>4D8-HACK</title></head>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <body ontouchmove="event.preventDefault()">
-<div style="vertical-align:center">4D Rogue like game</div>
-<canvas align="center" id="canvas0" width="288" height="360" style="background-color:black;border-style:solid;border-width:1px;border-color:#00FF00"></canvas><br>
+<div style="vertical-align:center">4D8-HACK - the 4D-Rogure-Like-Game</div>
+<canvas align="center" id="canvas0" width="288" height="360" style="width:288px;height:360px;background-color:black;border-style:solid;border-width:0px;border-color:#00FF00"></canvas><br>
 <address id="debug">
-4D rogue like game
-version <span id="versiondisplay"></span> <script type="text/javascript" src="./version.js"></script><br>
-programmed by <a href="http://twitter.com/#!/koteitan">koteitan</a>
-source code is at <a href="https://github.com/koteitan/4droguelike">github</a>
+4D8-HACK version <span id="versiondisplay"></span> <script type="text/javascript" src="./version.js"></script><br>
+programmed by <a href="http://twitter.com/#!/koteitan">koteitan</a> / 
+source code is at <a href="https://github.com/koteitan/js-sprite-game/tree/4droguelike">github</a><br>
+<a href="./about.html">about and how to play the game</a><br>
+inspired by Michael Brough's <a href="http://868-hack.neocities.org/">868-HACK</a>
 </address>
 </body>
 </html>

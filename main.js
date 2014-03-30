@@ -12,11 +12,13 @@ var mode=0; /* 0:play mode. 1:edit mode.*/
 var chara = function(){};
 var map = function(){};
 map.size = [6,6,6,6];
-map.map = Array.zeros(map.size);
+map.map;
 map.blank = 0;
 map.wall  = 1;
 var player = function(){}; // const for player
 player.pos = Array.zeros([dims]);// position of player
+player.hpmax;
+player.hp;
 var shiphones;
 var siphoneList = [];
 var sprite; // sprite object
@@ -53,6 +55,12 @@ var procAll=function(){
     break;
     case "enemymotion":
     makeEnemyMotion();
+    isRequestedDraw = true;
+    break;
+    case "gameover":
+    break;
+    case "initgame":
+    initGame();
     gameState = "userinput";
     isRequestedDraw = true;
     break;
@@ -156,11 +164,12 @@ var initGame=function(){
   //player ----------------
   player.pos = blanklist.splice(
       Math.floor(Math.random()*blanklist.length),1)[0];
-  player.hp = 3;
+  player.hpmax = 3;
+  player.hp = player.hpmax;
   //enemies ----------------
   var enemy_kinds = 4;
   var enemy_hpmax = [2,2,3,2];
-  enemies = 10;
+  enemies = 8;
   enemy = new Array(enemies);
   for(var e=0;e<enemies;e++){
     enemy[e] = function(){};
@@ -172,7 +181,7 @@ var initGame=function(){
     enemy[e].stan = false;
   }
   //siphone----------------
-  var initSiphones = 8;
+  var initSiphones = 16;
   shiphones = initSiphones;
   siphoneList = new Array(shiphones);
   for(var i=0; i<shiphones;i++){
@@ -181,7 +190,8 @@ var initGame=function(){
       Math.floor(Math.random()*blanklist.length),1)[0];
   }
   //wall--------------------
-  var walls = Math.floor(map.size.prod()/8);
+  var walls = Math.floor(map.size.prod()/4);
+  map.map = Array.zeros(map.size);
   for(var i=0; i<walls;i++){
     var pos = blanklist.splice(
       Math.floor(Math.random()*blanklist.length),1)[0];
@@ -296,7 +306,6 @@ var makeEnemyMotion = function(){
     }else{
       m = map.map.clone();
     }
-//    var m_sprite = sprite.addBg(m, chsize, [0,0], 4, "sm");
     for(var j=0;j<enemies;j++){
       //other enemies places are immobile
       if(j!=i) m[p[0]][p[1]][p[2]][p[3]] = 2;
@@ -331,16 +340,31 @@ var makeEnemyMotion = function(){
             }
           }
         }//d
-//        sprite.drawAll4d(ctx[0]);
       }//ni
       if(arrived.length>0){
         //can arrive
         var doBreak=false;
         for(var ai=0;ai<arrived.length;ai++){
           if(initialm.at(arrived[ai])==0){
-            enemy[i].pos = arrived[
-              Math.floor(arrived.length*Math.random())];
-              enemy[i].sprite.dstpos = enemy[i].pos;
+            // can move
+            if(arrived[ai].isEqual(player.pos)){
+              //attack
+              player.hp--;
+              if(player.hp<=0){
+                sprite.spriteList.splice(
+                  player.sprite.id,1);//remove sprite
+                gameState="gameover";
+                return;
+              }else{
+                sprite.spriteList[player.sprite.id].ch = 
+                  chara.player[player.hpmax-player.hp];
+              }
+            }else{
+              //move
+              enemy[i].pos = arrived[
+                Math.floor(arrived.length*Math.random())];
+                enemy[i].sprite.dstpos = enemy[i].pos;
+            }
             doBreak=true;
             break;
           }
@@ -361,6 +385,8 @@ var makeEnemyMotion = function(){
     //rokumen soka
     var roku=0;
   }//i
+  gameState = "userinput";
+  return;
 }
 var makeUserMotion = function(){
   var next = player.pos.clone();
@@ -390,15 +416,16 @@ var makeUserMotion = function(){
           canAttack = true;
           dpos=-2;// for break dpos
           e.hp--;
-          sprite.spriteList[e.sprite.id].ch = 
-            chara.enemy[e.type][e.hpmax-e.hp];
-          if(e.hp==0){
+          if(e.hp<=0){
             // e is dead
-            sprite.spriteList.splice(e.sprite.id,1);
+            sprite.spriteList[e.sprite.id].ch = 
+              chara.blank;
             enemy.splice(i,1);
             enemies--;
           }else{
             // stan e
+            sprite.spriteList[e.sprite.id].ch = 
+              chara.enemy[e.type][e.hpmax-e.hp];
             e.stan = true;
           }
         }
@@ -435,6 +462,9 @@ var makeUserMotion = function(){
 }
 //event handlers after queue ------------
 var handleMouseUp = function(){
+  if(gameState=="gameover"){
+    gameState="initgame";
+  }
   if(gameState=="userinput"){
     var d  = [mouseUpPos[0]-mouseDownPos[0], 
               mouseUpPos[1]-mouseDownPos[1]];
@@ -490,11 +520,16 @@ var handleMouseUp = function(){
 }
 var handleKeyDown = function(e){
   // play
-    var c = String.fromCharCode(e.keyCode);
-    var motion = "AW__DX__".indexOf(c);
-    if(motion<0) return;
-    if(e.shiftKey) motion+=2;
-    var motiondiff = [
+  if(gameState=="gameover"){
+    gameState="initgame";
+    return;
+  }
+
+  var c = String.fromCharCode(e.keyCode);
+  var motion = "AW__DX__".indexOf(c);
+  if(motion<0) return;
+  if(e.shiftKey) motion+=2;
+  var motiondiff = [
     //a  w  A  W  d  x  D  X
     [-1, 0, 0, 0,+1, 0, 0, 0], //x
     [ 0,-1, 0, 0, 0,+1, 0, 0], //y
