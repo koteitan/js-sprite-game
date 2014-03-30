@@ -1,26 +1,12 @@
 ------------------------------------------
-  4droguelike
-  template of the javascript code
-  for the 4 dimensional rogue-like-game 
-  with sprite
+  4D8-HACK
+    4-Dimensional Rogue-Like Game
 ------------------------------------------
-
-  concept:
-    - javascript HTML5 Canvas
-    - mainly worked on android and iphone
-    - template based on realtime or roguelike
-    - design with sprite and sprite sheet
     
   site:
-    http://www.ukaibutton.com/4droguelike/
-
+    http://www.ukaibutton.com/4d8hack/
   platform:
     javaScript / HTML5 Canvas
-
-  how to use in offline:
-    download all files and open index.html.
-    If you use with IE, excanvas.js is required.
-
-                                                 koteitan
-                              http://twitter.com/koteitan
+                                  koteitan
+               http://twitter.com/koteitan
 
