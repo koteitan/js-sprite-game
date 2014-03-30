@@ -19,7 +19,7 @@ var player = function(){}; // const for player
 player.pos = Array.zeros([dims]);// position of player
 player.hpmax;
 player.hp;
-var shiphones;
+var siphones;
 var siphoneList = [];
 var sprite; // sprite object
 var chsize; // charactor size (unit is pixcels)
@@ -181,10 +181,10 @@ var initGame=function(){
     enemy[e].stan = false;
   }
   //siphone----------------
-  var initSiphones = 16;
-  shiphones = initSiphones;
-  siphoneList = new Array(shiphones);
-  for(var i=0; i<shiphones;i++){
+  var initSiphones = 64;
+  siphones = initSiphones;
+  siphoneList = new Array(siphones);
+  for(var i=0; i<siphones;i++){
     siphoneList[i] = function(){};
     siphoneList[i].pos = blanklist.splice(
       Math.floor(Math.random()*blanklist.length),1)[0];
@@ -201,7 +201,7 @@ var initGame=function(){
   //sprites
   //----------------------------------
   map.sprite    = sprite.addBg(map.map, chsize, [0,0], 0, "bg");
-  for(var i=0; i<shiphones;i++){
+  for(var i=0; i<siphones;i++){
     siphoneList[i].sprite = sprite.addSprite(chara.siphon, 
       siphoneList[i].pos, 1, "siphone["+i+"]");
   }
@@ -454,6 +454,20 @@ var makeUserMotion = function(){
     if(canMove){
       player.pos = next;
       isRequestedDraw = true;
+      //check get siphone
+      for(var s=0;s<siphones;s++){
+        if(player.pos.isEqual(siphoneList[s].pos)){
+          //get siphone
+          player.hp++;
+          if(player.hp>player.hpmax) player.hp=player.hpmax;
+          sprite.spriteList[player.sprite.id].ch
+            = chara.player[player.hpmax-player.hp];
+          sprite.spriteList[siphoneList[s].sprite.id].ch
+            = chara.blank;
+          siphoneList.splice(s,1);
+          siphones--;
+        }//if
+      }//s
       gameState = "enemymotion";
     }else{
       gameState = "userinput";
