@@ -52,7 +52,7 @@ Array.prototype.clone = function(){
         }
         return ar;
     }
-    return Array.apply( null, this );
+    return [].concat(this);
 }
 /* Value of multidimensional array
    with index array i[d]
