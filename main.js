@@ -49,23 +49,7 @@ var procAll=function(){
       isRequestedDraw = true;
     break;
     case "usermotion":
-    var next = player.pos.clone();
-    var isFail = false;
-    for(var d=0;d<dims;d++){
-      next[d]+=input.move[d];
-      if(!(0<=next[d] && next[d]<map.size[d])){
-        isFail = true;
-        break;
-      }
-    };
-    if(isFail || map.map.at(next)!=map.blank){
-      isFail = true;
-    }
-    if(!isFail){
-      player.pos = next;
-      isRequestedDraw = true;
-    }
-    gameState = "enemymotion";
+    makeUserMotion();
     break;
     case "enemymotion":
     makeEnemyMotion();
@@ -185,9 +169,10 @@ var initGame=function(){
     enemy[e].type = Math.floor(Math.random()*enemy_kinds);
     enemy[e].hpmax = enemy_hpmax[enemy[e].type];
     enemy[e].hp    = enemy[e].hpmax;
+    enemy[e].stan = false;
   }
   //siphone----------------
-  var initSiphones = 2;
+  var initSiphones = 8;
   shiphones = initSiphones;
   siphoneList = new Array(shiphones);
   for(var i=0; i<shiphones;i++){
@@ -196,7 +181,7 @@ var initGame=function(){
       Math.floor(Math.random()*blanklist.length),1)[0];
   }
   //wall--------------------
-  var walls=Math.floor(map.size.prod()/8);
+  var walls = Math.floor(map.size.prod()/8);
   for(var i=0; i<walls;i++){
     var pos = blanklist.splice(
       Math.floor(Math.random()*blanklist.length),1)[0];
@@ -297,6 +282,12 @@ var procDraw = function(){
 
 var makeEnemyMotion = function(){
   for(var i=0;i<enemies;i++){
+    if(enemy[i].stan){
+      // if stanned
+      // recover stan
+      enemy[i].stan = false;
+      continue;
+    }
     var m;// 1=no, 0=mobile, 2=mobile but there exists other enemy
     var p = enemy[i].pos;
     //wall
@@ -371,13 +362,84 @@ var makeEnemyMotion = function(){
     var roku=0;
   }//i
 }
+var makeUserMotion = function(){
+  var next = player.pos.clone();
+  //attack check
+  var canAttack;
+  for(var dpos=1;dpos>0;dpos++){
+    // seek wall
+    canAttack = true;
+    for(var d=0;d<dims;d++){
+      next[d] += input.move[d];
+      if(!(0<=next[d] && next[d]<map.size[d])||
+         map.map.at(next)!=map.blank){
+        // attack is stopped
+        dpos=-2; //for break dpos
+        canAttack = false;
+        break;
+      }
+    }//d
+    if(canAttack){
+      // no wall
+      // seek enemies
+      canAttack = false;
+      for(var i=0;i<enemies;i++){
+        var e=enemy[i];
+        if(next.isEqual(e.pos)){
+          // success attack 
+          canAttack = true;
+          dpos=-2;// for break dpos
+          e.hp--;
+          sprite.spriteList[e.sprite.id].ch = 
+            chara.enemy[e.type][e.hpmax-e.hp];
+          if(e.hp==0){
+            // e is dead
+            sprite.spriteList.splice(e.sprite.id,1);
+            enemy.splice(i,1);
+            enemies--;
+          }else{
+            // stan e
+            e.stan = true;
+          }
+        }
+      }//e
+    }//canAttack
+  }//dpos
+  
+  if(canAttack){
+    // attack
+    isRequestedDraw = true;
+    gameState = "enemymotion";
+  }else{
+    // try motion
+    next = player.pos.clone();
+    var canMove = true;
+    for(var d=0;d<dims;d++){
+      next[d]+=input.move[d];
+      if(!(0<=next[d] && next[d]<map.size[d])){
+        canMove = false;
+        break;
+      }
+    };
+    if(!canMove || map.map.at(next)!=map.blank){
+      canMove = false;
+    }
+    if(canMove){
+      player.pos = next;
+      isRequestedDraw = true;
+      gameState = "enemymotion";
+    }else{
+      gameState = "userinput";
+    }
+  }
+}
 //event handlers after queue ------------
 var handleMouseUp = function(){
   if(gameState=="userinput"){
     var d  = [mouseUpPos[0]-mouseDownPos[0], 
               mouseUpPos[1]-mouseDownPos[1]];
-    if(Math.abs(d[0]) > map.size[0]*chsize[0]||
-       Math.abs(d[1]) > map.size[1]*chsize[1]){
+    if(Math.abs(d[0]) > 0.5*map.size[0]*chsize[0]||
+       Math.abs(d[1]) > 0.5*map.size[1]*chsize[1]){
       if(Math.abs(d[0])>Math.abs(d[1])){
         // move in x axis
         input.type = "move";
