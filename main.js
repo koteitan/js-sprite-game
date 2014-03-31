@@ -3,6 +3,14 @@
   main program and entry point
 ----------------------------------*/
 // static var on game
+var gamebalance=function(){};
+gamebalance.initEnemies  = 16;
+gamebalance.initHpmax    =  3;//player's HP
+gamebalance.initSiphones = 64;
+gamebalance.playerDamage = -1;//player recieved
+gamebalance.enemyDamage  = -1;//enemy recieved
+gamebalance.mapSize = [6,6,6,6];
+gamebalance.walls = Math.floor(gamebalance.mapSize.prod()/4);
 var dims=4;
 var isDebug1=1; //debug flag
 var isDebug2=0; //debug flag
@@ -11,7 +19,7 @@ var mmax = 8; //length of edge of the world (common for dimensions)
 var mode=0; /* 0:play mode. 1:edit mode.*/
 var chara = function(){};
 var map = function(){};
-map.size = [6,6,6,6];
+map.size = gamebalance.mapSize;
 map.map;
 map.blank = 0;
 map.wall  = 1;
@@ -164,12 +172,12 @@ var initGame=function(){
   //player ----------------
   player.pos = blanklist.splice(
       Math.floor(Math.random()*blanklist.length),1)[0];
-  player.hpmax = 3;
+  player.hpmax = gamebalance.initHpmax;
   player.hp = player.hpmax;
   //enemies ----------------
   var enemy_kinds = 4;
   var enemy_hpmax = [2,2,3,2];
-  enemies = 8;
+  enemies = gamebalance.initEnemies;
   enemy = new Array(enemies);
   for(var e=0;e<enemies;e++){
     enemy[e] = function(){};
@@ -181,7 +189,7 @@ var initGame=function(){
     enemy[e].stan = false;
   }
   //siphone----------------
-  var initSiphones = 64;
+  var initSiphones = gamebalance.initSiphones;
   siphones = initSiphones;
   siphoneList = new Array(siphones);
   for(var i=0; i<siphones;i++){
@@ -190,7 +198,7 @@ var initGame=function(){
       Math.floor(Math.random()*blanklist.length),1)[0];
   }
   //wall--------------------
-  var walls = Math.floor(map.size.prod()/4);
+  var walls = gamebalance.walls;
   map.map = Array.zeros(map.size);
   for(var i=0; i<walls;i++){
     var pos = blanklist.splice(
@@ -308,7 +316,8 @@ var makeEnemyMotion = function(){
     }
     for(var j=0;j<enemies;j++){
       //other enemies places are immobile
-      if(j!=i) m[p[0]][p[1]][p[2]][p[3]] = 2;
+      var q=enemy[j].pos;
+      if(j!=i) m[q[0]][q[1]][q[2]][q[3]] = 2;
     }
     var initialm = m.clone();
     var now = [player.pos.clone()];
@@ -341,38 +350,32 @@ var makeEnemyMotion = function(){
           }
         }//d
       }//ni
-      if(arrived.length>0){
-        //can arrive
-        var doBreak=false;
-        for(var ai=0;ai<arrived.length;ai++){
-          if(initialm.at(arrived[ai])==0){
-            // can move
-            if(arrived[ai].isEqual(player.pos)){
-              //attack
-              player.hp--;
-              if(player.hp<=0){
-                sprite.spriteList.splice(
-                  player.sprite.id,1);//remove sprite
-                gameState="gameover";
-                return;
-              }else{
-                sprite.spriteList[player.sprite.id].ch = 
-                  chara.player[player.hpmax-player.hp];
-              }
-            }else{
-              //move
-              enemy[i].pos = arrived[
-                Math.floor(arrived.length*Math.random())];
-                enemy[i].sprite.dstpos = enemy[i].pos;
-            }
-            doBreak=true;
-            break;
+      var noOtherEnemy = [];
+      for(var ai=0;ai<arrived.length;ai++){
+        if(initialm.at(arrived[ai])!=2) noOtherEnemy.push(ai);
+      }
+      if(noOtherEnemy.length>0){
+        var ai=noOtherEnemy.randomPop();
+        if(arrived[ai].isEqual(player.pos)){
+          //attack
+          player.hp+=gamebalance.playerDamage;
+          if(player.hp<=0){
+            sprite.spriteList.splice(
+              player.sprite.id,1);//remove sprite
+            gameState="gameover";
+            return;
+          }else{
+            sprite.spriteList[player.sprite.id].ch = 
+              chara.player[player.hpmax-player.hp];
           }
+        }else{
+          //move
+          enemy[i].pos = arrived[ai];
+          enemy[i].sprite.dstpos = enemy[i].pos;
         }
-        if(doBreak) break;
-      }//if arrived
+        break; //exit while(now.length>0)
+      }//if(noOtherEnemy.length>0)
       
-      // cannot arrive
       if(next.length>0){
         now = next;
         next = [];
@@ -381,9 +384,6 @@ var makeEnemyMotion = function(){
         break; //abandon to move
       }
     }//while(now.length>0)
-
-    //rokumen soka
-    var roku=0;
   }//i
   gameState = "userinput";
   return;
@@ -415,7 +415,7 @@ var makeUserMotion = function(){
           // success attack 
           canAttack = true;
           dpos=-2;// for break dpos
-          e.hp--;
+          e.hp+=gamebalance.enemyDamage;
           if(e.hp<=0){
             // e is dead
             sprite.spriteList[e.sprite.id].ch = 
