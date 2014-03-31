@@ -3,7 +3,6 @@
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<script type="text/javascript" src="./4dsoko_version.js"></script>
 <style><!--
   body{font-family:Arial;font-size:10pt;color:#00FF00; background-color:black}
   input{border-style:solid}
@@ -12,7 +11,7 @@
   a:visited{color:#00FF00;border-style:none;text-decoration:underline}
   a:hover{color:#00FF00;border-color:none;text-decoration:underline}
   address{text-align:right;font-style:normal}
-  td{text-align:center;border-color:#00FF00}
+  td{text-align:center;border-color:#00FF00;vertical-align:center}
   table{border-color:#00FF00;align:center}
   div{border-color:#00FF00;text-align:center}
   * {-webkit-user-select: none;image-rendering: -webkit-optimize-contrast;}
@@ -26,6 +25,16 @@ This game is inspired by Michael Brough's <a href="http://868-hack.neocities.org
 </p>
 <div><img src="snapshot1.png"></div>
 <div><a href="./">back to game</a></div>
+
+<h2>Charactors:</h2>
+<table>
+<tr><td><img src="player.png"      ></td><td>----</td><td>hacker </td><td>player. hit point is 3.</td></tr>
+<tr><td><img src="enemy.crypt.png" ></td><td>----</td><td>crypt  </td><td>enemy. hit point is 2.</td></tr>
+<tr><td><img src="enemy.virus.png" ></td><td>----</td><td>virus  </td><td>enemy. hit point is 2.</td></tr>
+<tr><td><img src="enemy.lap.png"   ></td><td>----</td><td>lap    </td><td>enemy. hit point is 2. it go thru <img src="wall.png">.</td></tr>
+<tr><td><img src="enemy.daemon.png"></td><td>----</td><td>daemon </td><td>enemy. hit point is 3.</td></tr>
+<tr><td><img src="siphone.png"     ></td><td>----</td><td>coin</td><td>item. hit point can be recovered.</tr>
+</table>
 
 <h2>How To Play:</h2>
 <table border=1 style="border-collapse:collapse"><caption>Motion</caption>
@@ -52,17 +61,23 @@ This game is inspired by Michael Brough's <a href="http://868-hack.neocities.org
 </table>
 (*1) Touch screen and mouse are not supported (keyboard only).<br>
 </td></tr></table>
+<h2>Knownbug:</h2>
+<ul>
+<li><img src="enemy.lap.png"> cannot be killed on the <img src="wall.png">.</li>
+</ul>
+
 <h2>Other 4-Dimensional Game I made:</h2>
 <ul>
 <li><a href="http://www.ukaibutton.com/4dbill/">4D billiards</a></li>
 <li><a href="http://www.ukaibutton.com/4dsoko/">4D soko</a></li>
 <li><a href="http://www.ukaibutton.com/4dtron/">4D TRON</a></li>
 </ul>
-<address>
-version <span id="versiondisplay"></span><br>
-<script type="text/javascript" src="./4dsoko_version.js"></script>
-programed by <a href="http://twitter.com/#!/koteitan">koteitan</a><br>
-source code is at <a href="https://github.com/koteitan/4dsoko">github</a><br>
+<address id="debug">
+4D8-HACK version <span id="versiondisplay"></span> <script type="text/javascript" src="./version.js"></script><br>
+programmed by <a href="http://twitter.com/#!/koteitan">koteitan</a> / 
+source code is at <a href="https://github.com/koteitan/js-sprite-game/tree/4droguelike">github</a><br>
+<a href="./about.html">about and how to play the game</a><br>
+inspired by Michael Brough's <a href="http://868-hack.neocities.org/">868-HACK</a>
 </address>
 
 
