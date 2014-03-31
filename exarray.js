@@ -131,3 +131,6 @@ Array.prototype.pushUniquely = function(e){
   }
   return this.push(e)-1;
 }
+Array.prototype.randomPop = function(){
+  return this.splice(Math.floor(Math.random()*this.length),1)[0];
+}
